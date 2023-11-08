@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.cpp.tierbuilder"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.cpp.tierbuilder"
