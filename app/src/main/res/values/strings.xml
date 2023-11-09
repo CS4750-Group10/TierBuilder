@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">TierBuilder</string>
     <string name="newListButton">Create a New List</string>
-    <string name="loadListButton">Load a Saved List</string>
+    <string name="loadListButton">My Lists</string>
 </resources>
