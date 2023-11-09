@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeScreenFragment">
+    <fragment
+        android:id="@+id/homeScreenFragment"
+        android:name="com.cpp.tierbuilder.HomeScreenFragment"
+        android:label="fragment_home_screen"
+        tools:layout="@layout/fragment_home_screen" >
+    </fragment>
+    <fragment
+        android:id="@+id/tierListFragment"
+        android:name="com.cpp.tierbuilder.TierListFragment"
+        android:label="fragment_tier_list"
+        tools:layout="@layout/fragment_tier_list" />
+    <fragment
+        android:id="@+id/savedListsFragment"
+        android:name="com.cpp.tierbuilder.SavedListsFragment"
+        android:label="fragment_saved_lists"
+        tools:layout="@layout/fragment_saved_lists" />
+
+</navigation>
