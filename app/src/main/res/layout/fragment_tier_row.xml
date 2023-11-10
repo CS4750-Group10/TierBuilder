@@ -15,18 +15,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/imageRecyclerView"
-        android:layout_width="wrap_content"
-        android:layout_height="64dp"
-        app:layout_constraintStart_toEndOf="@+id/tierTextView"
-        app:layout_constraintTop_toTopOf="parent"
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/imageContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_default="wrap"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"/>
+        app:layout_constraintStart_toEndOf="@id/tierTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:flexWrap="wrap"
+        app:alignItems="center"
+        app:alignContent="center"
+        app:justifyContent="center"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
