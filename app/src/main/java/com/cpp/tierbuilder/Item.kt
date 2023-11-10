@@ -1,6 +1,7 @@
 package com.cpp.tierbuilder
 
-// this class is intended to represent a single image within a single tier
+// A single item to be put into the tier list
 data class Item(
-    val name: String
+    val name: String = "",
+    val imageFileName: String? = null
 )
