@@ -56,6 +56,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
+    implementation ("com.google.android.flexbox:flexbox:3.0.0") // flowlayout
     annotationProcessor("androidx.room:room-compiler:2.6.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
