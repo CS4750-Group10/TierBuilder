@@ -7,7 +7,7 @@ import java.util.UUID
 @Entity
 data class TierList(
     @PrimaryKey val id: UUID,
-    val name: String,
+    val title: String,
     val tierRowList: List<TierRow>,
     val pendingList: List<Item>
 )
