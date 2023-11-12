@@ -22,12 +22,6 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-<<<<<<< Updated upstream
-        android:layout_height="match_parent"
-        android:padding="8dp" />
-
-</RelativeLayout>
-=======
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#FFFFFF"
@@ -49,6 +43,7 @@
     android:orientation="horizontal"
     android:background="#000000">
 
+    <!-- Remove the buttons from here -->
+
     </LinearLayout>
 </RelativeLayout>
->>>>>>> Stashed changes

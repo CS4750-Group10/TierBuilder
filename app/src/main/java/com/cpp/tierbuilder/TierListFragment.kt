@@ -7,6 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,7 @@ class TierListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_tier_list, container, false)
 
+        // Set up the Toolbar
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
@@ -32,11 +34,8 @@ class TierListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-<<<<<<< Updated upstream
-=======
-        setHasOptionsMenu(true) //deprecated but it doesnt work without it??
+        setHasOptionsMenu(true) // This line is important to indicate that the fragment has its own options menu
 
->>>>>>> Stashed changes
         return view
     }
 
