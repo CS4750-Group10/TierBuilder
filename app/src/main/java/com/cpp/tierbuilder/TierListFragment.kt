@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
-class TierListFragment : Fragment() {
+class TierListFragment : Fragment(), TierRowEditListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: TierRowAdapter
@@ -30,7 +30,7 @@ class TierListFragment : Fragment() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
         recyclerView = view.findViewById(R.id.recyclerView)
-        adapter = TierRowAdapter()
+        adapter = TierRowAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -60,5 +60,12 @@ class TierListFragment : Fragment() {
             }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onEditTitleClicked(position: Int) {
+        // Implement the edit title logic here
+        val tierRow = adapter.getTierRow(position)
+        tierRow.isEditing = true
+        adapter.notifyItemChanged(position)
     }
 }
