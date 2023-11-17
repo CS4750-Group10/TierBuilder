@@ -31,6 +31,7 @@
             android:id="@+id/imageContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:background="#2C2A2A"
             app:alignContent="center"
             app:alignItems="center"
             app:flexWrap="wrap"

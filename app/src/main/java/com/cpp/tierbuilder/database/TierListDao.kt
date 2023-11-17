@@ -14,7 +14,7 @@ interface TierListDao {
     @Query("SELECT * FROM tierList")
     fun getTierLists(): Flow<List<TierList>>
 
-    @Query("SELECT * FROM tierList WHERE id(:id)")
+    @Query("SELECT * FROM tierList WHERE id = :id")
     suspend fun getTierList(id: UUID): TierList
 
     @Insert
