@@ -77,14 +77,14 @@ class TierRowAdapter(private val editListener: TierRowEditListener) : RecyclerVi
         }
 
         when (position) {
-            0 -> holder.labelTextView.setTextColor(Color.RED)
-            1 -> holder.labelTextView.setTextColor(Color.rgb(255, 165, 0))
-            2 -> holder.labelTextView.setTextColor(Color.YELLOW)
-            3 -> holder.labelTextView.setTextColor(Color.GREEN)
-            4 -> holder.labelTextView.setTextColor(Color.rgb(13, 216, 230))
-            5 -> holder.labelTextView.setTextColor(Color.rgb(148, 87, 235))
-            6 -> holder.labelTextView.setTextColor(Color.rgb(238, 130, 238))
-            else -> holder.labelTextView.setTextColor(Color.BLACK)
+            0 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#FF0000")) // Red
+            1 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#FFA500")) // Orange
+            2 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#FFFF00")) // Yellow
+            3 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#00FF00")) // Green
+            4 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#0DD8E6")) // Turquoise
+            5 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#9457EB")) // Purple
+            6 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#EE82EE")) // Violet
+            else -> holder.labelTextView.setBackgroundColor(Color.BLACK) // Default color
         } // You can set the color as per your requirement
 
     }
