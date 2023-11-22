@@ -6,4 +6,8 @@ data class TierRow(
     val color: String,
     val items: List<Item>,
     var isEditing: Boolean = false
-)
+) {
+    override fun toString(): String {
+        return "TierRow($title, $row, $color, $items, $isEditing)"
+    }
+}

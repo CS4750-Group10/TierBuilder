@@ -4,4 +4,8 @@ package com.cpp.tierbuilder
 data class Item(
     val name: String = "",
     val imageFileName: String? = null
-)
+) {
+    override fun toString(): String {
+        return "Item($name; $imageFileName)"
+    }
+}

@@ -8,6 +8,6 @@ import java.util.UUID
 data class TierList(
     @PrimaryKey val id: UUID,
     val title: String,
-    val tierRowList: List<TierRow>,
-    val pendingList: List<Item>
+    val tierRowList: List<TierRow> = emptyList(),
+    val pendingList: List<Item> = emptyList()
 )

@@ -9,16 +9,31 @@
         android:name="com.cpp.tierbuilder.HomeScreenFragment"
         android:label="fragment_home_screen"
         tools:layout="@layout/fragment_home_screen" >
+        <action
+            android:id="@+id/create_tier_list"
+            app:destination="@id/tierListFragment" />
+        <action
+            android:id="@+id/show_all_lists"
+            app:destination="@id/savedListsFragment" />
     </fragment>
     <fragment
         android:id="@+id/tierListFragment"
         android:name="com.cpp.tierbuilder.TierListFragment"
         android:label="fragment_tier_list"
-        tools:layout="@layout/fragment_tier_list" />
+        tools:layout="@layout/fragment_tier_list">
+        <argument
+            android:name="tierlistId"
+            app.argType="java.util.UUID"
+            app:argType="java.util.UUID" />
+    </fragment>
     <fragment
         android:id="@+id/savedListsFragment"
         android:name="com.cpp.tierbuilder.SavedListsFragment"
         android:label="fragment_saved_lists"
-        tools:layout="@layout/fragment_saved_lists" />
+        tools:layout="@layout/fragment_saved_lists" >
+        <action
+            android:id="@+id/load_tier_list"
+            app:destination="@id/tierListFragment" />
+    </fragment>
 
 </navigation>

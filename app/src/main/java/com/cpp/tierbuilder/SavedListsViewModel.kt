@@ -11,7 +11,6 @@ class SavedListsViewModel : ViewModel() {
     private val tierListRepository = TierListRepository.get()
 
     private val _tierlists: MutableStateFlow<List<TierList>> = MutableStateFlow(emptyList())
-
     val tierlists: StateFlow<List<TierList>>
         get() = _tierlists.asStateFlow()
 
