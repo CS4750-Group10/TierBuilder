@@ -8,11 +8,13 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.FragmentContainerView
 
 class TierListFragment : Fragment(), TierRowEditListener {
 
@@ -37,6 +39,21 @@ class TierListFragment : Fragment(), TierRowEditListener {
         setHasOptionsMenu(true) // This line is important to indicate that the fragment has its own options menu
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Find the FrameLayout container in the current fragment's view
+        val fragmentContainer = view.findViewById<FrameLayout>(R.id.fragmentContainer)
+
+        // Create an instance of PhotoBankFragment
+        val photoBankFragment = PhotoBankFragment()
+
+        // Replace any existing fragments in the container with the PhotoBankFragment
+        childFragmentManager.beginTransaction()
+            .replace(fragmentContainer.id, photoBankFragment)
+            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
