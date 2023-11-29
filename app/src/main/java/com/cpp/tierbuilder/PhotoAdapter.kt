@@ -16,11 +16,10 @@ class PhotoAdapter(
     private val onImageClick: (String) -> Unit
 ) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
 
-    public val imageUrls: MutableList<String> = mutableListOf()
+    private val imageUrls: MutableList<String> = mutableListOf()
 
     inner class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.imageView)
-        val btnAdd: ImageButton = itemView.findViewById(R.id.btnAdd)
+        val imageView: ImageView = itemView.findViewById(R.id.imageView) // Replace with your actual image view ID
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
@@ -29,31 +28,14 @@ class PhotoAdapter(
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        if (position == imageUrls.size) {
-            // This is the last position, show the "Add" button
-            holder.imageView.visibility = View.GONE
-            holder.btnAdd.visibility = View.VISIBLE
-            holder.btnAdd.setOnClickListener {
-                // Trigger the image upload process
-                // You can open a file picker or camera intent to choose/upload an image
-                // For simplicity, I'm assuming you have a method for adding a new image
-                onImageClick.invoke("new_image_url_placeholder")
-            }
-        } else {
-            // Show the image
-            holder.imageView.visibility = View.VISIBLE
-            holder.btnAdd.visibility = View.GONE
+        val imageUrl = imageUrls[position]
 
-            val imageUrl = imageUrls[position]
+        Glide.with(context)
+            .load(imageUrl)
+            .into(holder.imageView)
 
-            Glide.with(context)
-                .load(imageUrl)
-                .into(holder.imageView)
-
-            holder.itemView.setOnClickListener { onImageClick(imageUrl) }
-        }
+        holder.itemView.setOnClickListener { onImageClick(imageUrl) }
     }
-
 
     override fun getItemCount(): Int {
         return imageUrls.size
@@ -64,4 +46,10 @@ class PhotoAdapter(
         imageUrls.addAll(images)
         notifyDataSetChanged()
     }
+
+    fun addImage(imageUrl: String) {
+        imageUrls.add(imageUrl)
+        notifyItemInserted(imageUrls.size - 1)
+    }
+
 }

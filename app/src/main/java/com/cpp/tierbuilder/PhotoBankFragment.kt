@@ -64,11 +64,12 @@ class PhotoBankFragment : Fragment() {
             // Perform your image upload logic here
             if (selectedImageUri != null) {
                 // You can use the selectedImageUri to upload the image to your server or storage
-                // For simplicity, you can show a toast message with the image URI
-                Toast.makeText(requireContext(), "Selected Image: $selectedImageUri", Toast.LENGTH_SHORT).show()
+                // For simplicity, add the selected image URL to the adapter
+                photoAdapter.addImage(selectedImageUri.toString())
             }
         }
     }
+
 
     companion object {
         private const val PICK_IMAGE_REQUEST = 1
