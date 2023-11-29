@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class SavedListsViewModel : ViewModel() {
     private val tierListRepository = TierListRepository.get()
@@ -14,6 +15,10 @@ class SavedListsViewModel : ViewModel() {
     val tierlists: StateFlow<List<TierList>>
         get() = _tierlists.asStateFlow()
 
+    private var _selectedLists = mutableListOf<UUID>()
+    val selectedLists: List<UUID>
+        get() = _selectedLists.toList()
+
     init {
         viewModelScope.launch {
             tierListRepository.getTierLists().collect() {
@@ -21,6 +26,31 @@ class SavedListsViewModel : ViewModel() {
             }
         }
     }
+    // Create a copy of a tier list with a new UUID and title
+    suspend fun copyTierList(tierListId: UUID) {
+        val oldTierList = tierListRepository.getTierList(tierListId)
+        val copy = oldTierList.copy(
+            id = UUID.randomUUID(),
+            title = "Copy of ${oldTierList.title}"
+        )
+        tierListRepository.addTierList(copy)
+    }
 
-    //Place functions for copy, delete, and load tier lists here
+    // Delete a tier list from database
+    suspend fun deleteTierList(tierListId: UUID) {
+        tierListRepository.deleteTierList(tierListId)
+    }
+
+    // Functions for selected items in RecyclerView
+    fun toggleSelection(tierListId: UUID) {
+        if (_selectedLists.contains(tierListId)) {
+            _selectedLists.remove(tierListId)
+        } else {
+            _selectedLists.add(tierListId)
+        }
+    }
+
+    fun clearSelections() {
+        _selectedLists.clear()
+    }
 }

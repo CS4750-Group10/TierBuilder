@@ -26,6 +26,10 @@ class TierListRepository private constructor(
 
     suspend fun getTierList(id: UUID): TierList = database.tierListDao().getTierList(id)
 
+    suspend fun addTierList(tierList: TierList) {
+        database.tierListDao().addTierList(tierList)
+    }
+
     fun updateTierList(tierlist: TierList) {
         coroutineScope.launch {
             database.tierListDao().updateTierList(tierlist)
