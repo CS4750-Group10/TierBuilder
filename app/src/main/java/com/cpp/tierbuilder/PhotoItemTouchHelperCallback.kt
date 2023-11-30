@@ -3,8 +3,10 @@ package com.cpp.tierbuilder
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class PhotoItemTouchHelperCallback(private val adapter: PhotoAdapter) :
-    ItemTouchHelper.Callback() {
+class PhotoItemTouchHelperCallback(
+    private val adapter: PhotoAdapter,
+    private val onPhotoDrag: (String) -> Unit
+) : ItemTouchHelper.Callback() {
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -20,8 +22,9 @@ class PhotoItemTouchHelperCallback(private val adapter: PhotoAdapter) :
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
-        // Handle the data change (e.g., reorder images in the list)
+        val fromPosition = viewHolder.adapterPosition
+        val toPosition = target.adapterPosition
+        adapter.swapItems(fromPosition, toPosition)
         return true
     }
 

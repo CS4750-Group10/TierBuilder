@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentContainerView
 
-class TierListFragment : Fragment(), TierRowEditListener {
+class TierListFragment : Fragment(), TierRowEditListener,PhotoBankFragment.PhotoDragListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: TierRowAdapter
@@ -49,6 +50,8 @@ class TierListFragment : Fragment(), TierRowEditListener {
 
         // Create an instance of PhotoBankFragment
         val photoBankFragment = PhotoBankFragment()
+
+        photoBankFragment.setPhotoDragListener(this)
 
         // Replace any existing fragments in the container with the PhotoBankFragment
         childFragmentManager.beginTransaction()
@@ -85,4 +88,17 @@ class TierListFragment : Fragment(), TierRowEditListener {
         tierRow.isEditing = true
         adapter.notifyItemChanged(position)
     }
+
+    override fun onPhotoDrag(imageUrl: String) {
+        // Example: Display a toast message with the dragged photo's URL
+        Toast.makeText(requireContext(), "Dragged Photo URL: $imageUrl", Toast.LENGTH_SHORT).show()
+
+        // Example: Add the dragged photo to your tier list
+        val newItem = Item(name = "New Item", imageFileName = imageUrl)
+        val tierRow = TierRow("New Title", adapter.itemCount + 1, "Color", listOf(newItem))
+        adapter.addRow(tierRow)
+    }
+
+
+
 }
