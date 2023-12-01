@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.FragmentContainerView
+import androidx.lifecycle.Lifecycle
 
 class TierListFragment : Fragment(), TierRowEditListener,PhotoBankFragment.PhotoDragListener {
 
@@ -32,18 +35,43 @@ class TierListFragment : Fragment(), TierRowEditListener,PhotoBankFragment.Photo
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
+        // Initialize recycler view with its adapter
         recyclerView = view.findViewById(R.id.recyclerView)
         adapter = TierRowAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
-
-        setHasOptionsMenu(true) // This line is important to indicate that the fragment has its own options menu
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //Initialize Options Menu functionality
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.tier_list_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.menu_add -> {
+                        val newTierRow = TierRow("New Title", adapter.itemCount + 1, "Color", listOf())
+                        adapter.addRow(newTierRow)
+                        true
+                    }
+                    R.id.menu_delete -> {
+                        val lastPosition = adapter.itemCount - 1
+                        if (lastPosition >= 0) {
+                            adapter.deleteRow(lastPosition)
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         // Find the FrameLayout container in the current fragment's view
         val fragmentContainer = view.findViewById<FrameLayout>(R.id.fragmentContainer)
@@ -57,29 +85,6 @@ class TierListFragment : Fragment(), TierRowEditListener,PhotoBankFragment.Photo
         childFragmentManager.beginTransaction()
             .replace(fragmentContainer.id, photoBankFragment)
             .commit()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tier_list_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_add -> {
-                val newTierRow = TierRow("New Title", adapter.itemCount + 1, "Color", listOf())
-                adapter.addRow(newTierRow)
-                return true
-            }
-            R.id.menu_delete -> {
-                val lastPosition = adapter.itemCount - 1
-                if (lastPosition >= 0) {
-                    adapter.deleteRow(lastPosition)
-                }
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onEditTitleClicked(position: Int) {
