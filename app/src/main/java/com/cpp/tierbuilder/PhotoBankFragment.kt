@@ -37,18 +37,13 @@ class PhotoBankFragment : Fragment() {
 
         // Initialize RecyclerView and its adapter
         photoRecyclerView = view.findViewById(R.id.photoRecyclerView)
-        photoAdapter = PhotoAdapter(requireContext(), photoRecyclerView) { imageUrl ->
-            photoDragListener?.onPhotoDrag(imageUrl)
+
+        // Update the instantiation of PhotoAdapter
+        photoAdapter = PhotoAdapter(requireContext()) { imageUrl ->
         }
 
         photoRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         photoRecyclerView.adapter = photoAdapter
-
-        // Attach ItemTouchHelper for drag-and-drop functionality
-        val itemTouchHelper = ItemTouchHelper(PhotoItemTouchHelperCallback(photoAdapter) { imageUrl ->
-            photoDragListener?.onPhotoDrag(imageUrl)
-        })
-        itemTouchHelper.attachToRecyclerView(photoRecyclerView)
 
         // Get reference to the 'Upload' button
         val btnUpload: Button = view.findViewById(R.id.upload)
@@ -69,14 +64,12 @@ class PhotoBankFragment : Fragment() {
 
         // Initialize RecyclerView and its adapter
         photoRecyclerView = view.findViewById(R.id.photoRecyclerView)
-        photoAdapter = PhotoAdapter(requireContext(), photoRecyclerView) { imageUrl ->
+
+        // Update the instantiation of PhotoAdapter
+        photoAdapter = PhotoAdapter(requireContext()) { imageUrl ->
             // Handle click or drag-and-drop of images here
             // You can pass the image URL to the tier list or perform other actions
         }
-
-        val itemTouchHelper = ItemTouchHelper(PhotoItemTouchHelperCallback(photoAdapter)
-        { imageUrl -> photoDragListener?.onPhotoDrag(imageUrl) })
-        itemTouchHelper.attachToRecyclerView(photoRecyclerView)
 
         photoRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         photoRecyclerView.adapter = photoAdapter

@@ -95,13 +95,6 @@ class TierListFragment : Fragment(), TierRowEditListener,PhotoBankFragment.Photo
     }
 
     override fun onPhotoDrag(imageUrl: String) {
-        // Example: Display a toast message with the dragged photo's URL
-        Toast.makeText(requireContext(), "Dragged Photo URL: $imageUrl", Toast.LENGTH_SHORT).show()
-
-        // Example: Add the dragged photo to your tier list
-        val newItem = Item(name = "New Item", imageFileName = imageUrl)
-        val tierRow = TierRow("New Title", adapter.itemCount + 1, "Color", listOf(newItem))
-        adapter.addRow(tierRow)
     }
 
 
