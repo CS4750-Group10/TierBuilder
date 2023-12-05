@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,13 +24,18 @@ class PhotoBankFragment : Fragment() {
     private lateinit var photoAdapter: PhotoAdapter
 
     interface PhotoDragListener {
-        fun onPhotoDrag(imageUrl: String)
+        fun onImageSelected(imageUrl: String)
     }
 
     private var photoDragListener: PhotoDragListener? = null
 
     fun setPhotoDragListener(listener: PhotoDragListener) {
-        this.photoDragListener = listener
+        photoDragListener = listener
+    }
+
+    private fun notifyImageSelected(imageUrl: String) {
+        photoDragListener?.onImageSelected(imageUrl)
+        Log.d("PhotoBankFragment", "Image selected: $imageUrl")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,6 +46,7 @@ class PhotoBankFragment : Fragment() {
 
         // Update the instantiation of PhotoAdapter
         photoAdapter = PhotoAdapter(requireContext()) { imageUrl ->
+            notifyImageSelected(imageUrl)
         }
 
         photoRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
@@ -53,6 +60,9 @@ class PhotoBankFragment : Fragment() {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
+
+        Log.d("PhotoBankFragment", "onViewCreated called")
+
     }
 
 
@@ -82,6 +92,8 @@ class PhotoBankFragment : Fragment() {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
+
+        Log.d("PhotoBankFragment", "onCreateView called")
 
         return view
     }

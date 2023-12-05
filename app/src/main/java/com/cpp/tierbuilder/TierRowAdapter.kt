@@ -6,17 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.android.flexbox.FlexboxLayout
 
 // Add a callback interface
 interface TierRowEditListener {
     fun onEditTitleClicked(position: Int)
 }
 
-class TierRowAdapter(private val editListener: TierRowEditListener) : RecyclerView.Adapter<TierRowAdapter.TierRowViewHolder>() {
+class TierRowAdapter(
+    private val editListener: TierRowEditListener,
+    private val imageAdditionListener: ImageAdditionListener? = null
+) : RecyclerView.Adapter<TierRowAdapter.TierRowViewHolder>() {
 
     private val tierRows = mutableListOf<TierRow>()
+
+    interface ImageAdditionListener {
+        fun onAddImageClicked(position: Int)
+    }
+
 
     init {
         generateDefaultRows()
@@ -24,7 +35,13 @@ class TierRowAdapter(private val editListener: TierRowEditListener) : RecyclerVi
     private fun generateDefaultRows() {
         val defaultLabels = listOf("S", "A", "B", "C", "D", "E", "F")
         for ((index, label) in defaultLabels.withIndex()) {
-            val tierRow = TierRow(label, index + 1, "Color", listOf())
+            val tierRow = if (index == 0) {
+                // Add a sample image to the first tier row
+                val sampleImageUrl = "https://example.com/sample-image.jpg"
+                TierRow(label, index + 1, "Color", mutableListOf(sampleImageUrl))
+            } else {
+                TierRow(label, index + 1, "Color", mutableListOf())
+            }
             tierRows.add(tierRow)
         }
     }
@@ -33,6 +50,10 @@ class TierRowAdapter(private val editListener: TierRowEditListener) : RecyclerVi
         // You can access views within your TierRowFragment layout here
         val labelTextView: TextView = itemView.findViewById(R.id.tierTextView)
         val editTitleEditText: EditText = itemView.findViewById(R.id.editTitleEditText)
+
+        val btnAddImage: ImageView = itemView.findViewById(R.id.btnAddImage)
+
+        val imageContainer: FlexboxLayout = itemView.findViewById(R.id.imageContainer)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TierRowViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -49,6 +70,29 @@ class TierRowAdapter(private val editListener: TierRowEditListener) : RecyclerVi
 
         holder.editTitleEditText.inputType =
             android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+
+        // Clear existing views in the FlexboxLayout
+        holder.imageContainer.removeAllViews()
+
+        // Add ImageViews dynamically to the FlexboxLayout based on the images associated with the tier row
+        for (imageUrl in tierRow.images) {
+            val imageView = ImageView(holder.itemView.context)
+
+            // Set layout parameters for the ImageView
+            val layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            imageView.layoutParams = layoutParams
+
+            // Load the image using your preferred image loading library (e.g., Glide)
+            Glide.with(holder.itemView.context)
+                .load(imageUrl)
+                .into(imageView)
+
+            // Add the ImageView to the FlexboxLayout
+            holder.imageContainer.addView(imageView)
+        }
 
         // Update the visibility of views based on the edit mode
         if (tierRow.isEditing) {
@@ -86,6 +130,11 @@ class TierRowAdapter(private val editListener: TierRowEditListener) : RecyclerVi
             6 -> holder.labelTextView.setBackgroundColor(Color.parseColor("#EE82EE")) // Violet
             else -> holder.labelTextView.setBackgroundColor(Color.BLACK) // Default color
         } // You can set the color as per your requirement
+
+        holder.btnAddImage.setOnClickListener {
+            // Notify the listener that the add image icon is clicked
+            imageAdditionListener?.onAddImageClicked(position)
+        }
 
     }
 

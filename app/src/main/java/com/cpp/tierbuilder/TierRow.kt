@@ -4,10 +4,10 @@ data class TierRow(
     var title: String,
     val row: Int,
     val color: String,
-    val items: List<Item>,
+    val images: MutableList<String>,  // Add this line for images
     var isEditing: Boolean = false
 ) {
     override fun toString(): String {
-        return "TierRow($title, $row, $color, $items, $isEditing)"
+        return "TierRow($title, $row, $color, $images, $isEditing)"
     }
 }
