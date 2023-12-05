@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import java.util.UUID
 
 class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAdditionListener {
 
@@ -71,6 +72,10 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
                         }
                         true
                     }
+                    R.id.menu_save ->{
+                        onSaveButtonClick()  //save button was pressed
+                        true
+                    }
                     else -> false
                 }
             }
@@ -87,6 +92,29 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
             .replace(fragmentContainer.id, photoBankFragment)
             .commit()
     }
+
+    private fun onSaveButtonClick() {    //when they click SAVE
+        val tierRows = adapter.getTierRows();  //get the rows from the adapter
+        val tierList = createTierList(tierRows) //put them all in a list
+        //show the keyboard to ask for a List Title
+            //we could reuse some of caboosesheps code for editing row titles
+
+        //tierList.title = whateverTheUserTyped
+
+        //lastly, save it to the database
+            //requires a working understanding of how databases work.
+            //but at this point, tierList will contain everything it needs to be saved for later
+
+    }
+
+    private fun createTierList(tierRows: List<TierRow>): TierList {  //create instance of tierList
+        return TierList(
+            id = UUID.randomUUID(), //generate a unique ID
+            title = "", // empty at first
+            tierRowList = tierRows
+        )
+    }
+
 
     override fun onEditTitleClicked(position: Int) {
         // Implement the edit title logic here

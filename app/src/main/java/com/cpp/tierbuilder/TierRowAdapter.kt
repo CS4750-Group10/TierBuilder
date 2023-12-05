@@ -159,4 +159,7 @@ class TierRowAdapter(
         return tierRows[position]
     }
 
+    fun getTierRows(): List<TierRow> {  //call this function when user clicks
+        return tierRows.toList()
+    }
 }
