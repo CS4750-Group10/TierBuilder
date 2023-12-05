@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
+import java.util.UUID
 
 class HomeScreenFragment : Fragment(){
 
@@ -19,13 +20,18 @@ class HomeScreenFragment : Fragment(){
         val newListButton: Button = view.findViewById(R.id.newListButton)
         val loadListButton: Button = view.findViewById(R.id.loadListButton)
 
-
+        // Go to Tier List Builder
         newListButton.setOnClickListener {
-            findNavController().navigate(R.id.tierListFragment)
+            findNavController().navigate(
+                HomeScreenFragmentDirections.createTierList(UUID.randomUUID())
+            )
         }
 
+        // Go to Saved Tier Lists
         loadListButton.setOnClickListener {
-            findNavController().navigate(R.id.savedListsFragment)
+            findNavController().navigate(
+                HomeScreenFragmentDirections.showAllLists()
+            )
         }
 
         return view

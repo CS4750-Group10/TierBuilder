@@ -142,7 +142,6 @@ class TierRowAdapter(
         return tierRows.size
     }
 
-
     fun addRow(tierRow: TierRow) {
         tierRows.add(tierRow)
         notifyItemInserted(tierRows.size - 1)
@@ -161,5 +160,12 @@ class TierRowAdapter(
 
     fun getTierRows(): List<TierRow> {  //call this function when user clicks
         return tierRows.toList()
+    }
+
+    // Set tier row list
+    fun setTierRows(newTierRows: List<TierRow>) {
+        tierRows.clear()
+        tierRows.addAll(newTierRows)
+        notifyDataSetChanged()
     }
 }

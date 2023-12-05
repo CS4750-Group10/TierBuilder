@@ -9,5 +9,5 @@ data class TierList(
     @PrimaryKey val id: UUID,
     val title: String,
     val tierRowList: List<TierRow> = emptyList(),
-    val pendingList: List<Item> = emptyList()
+    val pendingList: List<String> = emptyList()
 )

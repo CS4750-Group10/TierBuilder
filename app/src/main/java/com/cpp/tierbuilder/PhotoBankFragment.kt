@@ -115,9 +115,15 @@ class PhotoBankFragment : Fragment() {
     }
 
 
+    fun getImageList(): List<String> {
+        return photoAdapter.getImageList()
+    }
+
+    fun setImageList(imageList: List<String>) {
+        photoAdapter.setImages(imageList)
+    }
+
     companion object {
         private const val PICK_IMAGE_REQUEST = 1
     }
 }
-
-

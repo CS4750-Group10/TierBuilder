@@ -4,7 +4,7 @@ data class TierRow(
     var title: String,
     val row: Int,
     val color: String,
-    val images: MutableList<String>,  // Add this line for images
+    val images: List<String>,  // Add this line for images
     var isEditing: Boolean = false
 ) {
     override fun toString(): String {

@@ -48,4 +48,8 @@ class PhotoAdapter(
         imageUrls.add(imageUrl)
         notifyItemInserted(imageUrls.size - 1)
     }
+
+    fun getImageList(): List<String> {
+        return imageUrls.toList()
+    }
 }

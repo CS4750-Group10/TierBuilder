@@ -8,43 +8,53 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import java.util.UUID
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.navArgs
+import com.cpp.tierbuilder.databinding.FragmentTierListBinding
+import kotlinx.coroutines.launch
 
 class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAdditionListener {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: TierRowAdapter
-    private lateinit var fragmentContainer: FrameLayout
+    private var _binding: FragmentTierListBinding? = null
+    private val binding
+        get() = checkNotNull(_binding) {
+            "Cannot access binding because it is not null. Is the view visible?"
+        }
+
+    private val args: TierListFragmentArgs by navArgs()
+
+    private val tierListViewModel: TierListViewModel by viewModels() {
+        TierListViewModelFactory(args.tierlistId)
+    }
+
+    private lateinit var tierRowAdapter: TierRowAdapter
+    private val photoBankFragment = PhotoBankFragment()
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_tier_list, container, false)
+        _binding = FragmentTierListBinding.inflate(inflater, container, false)
 
         // Set up the Toolbar
-        val toolbar: Toolbar = view.findViewById(R.id.toolbar)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.tierlistToolbar)
 
         // Initialize recycler view with its adapter
-        recyclerView = view.findViewById(R.id.recyclerView)
-        adapter = TierRowAdapter(this, this)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        tierRowAdapter = TierRowAdapter(this, this)
+        binding.tierRowRecyclerView.adapter = tierRowAdapter
+        binding.tierRowRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        fragmentContainer = view.findViewById(R.id.fragmentContainer)
-
-        return view
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,20 +70,20 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.menu_add -> {
-                        val newTierRow = TierRow("New Title", adapter.itemCount + 1,
+                        val newTierRow = TierRow("New Title",tierRowAdapter.itemCount + 1,
                             "Color", mutableListOf())
-                        adapter.addRow(newTierRow)
+                        tierRowAdapter.addRow(newTierRow)
                         true
                     }
                     R.id.menu_delete -> {
-                        val lastPosition = adapter.itemCount - 1
+                        val lastPosition = tierRowAdapter.itemCount - 1
                         if (lastPosition >= 0) {
-                            adapter.deleteRow(lastPosition)
+                           tierRowAdapter.deleteRow(lastPosition)
                         }
                         true
                     }
                     R.id.menu_save ->{
-                        onSaveButtonClick()  //save button was pressed
+                        onSaveButtonClick()
                         true
                     }
                     else -> false
@@ -81,21 +91,39 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        // Find the FrameLayout container in the current fragment's view
-        val fragmentContainer = view.findViewById<FrameLayout>(R.id.fragmentContainer)
-
-        // Create an instance of PhotoBankFragment
-        val photoBankFragment = PhotoBankFragment()
-
         // Replace any existing fragments in the container with the PhotoBankFragment
         childFragmentManager.beginTransaction()
-            .replace(fragmentContainer.id, photoBankFragment)
+            .replace(binding.fragmentContainer.id, photoBankFragment)
             .commit()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                tierListViewModel.tierList.collect { tierList ->
+                    tierList?.let {
+                        tierRowAdapter.setTierRows(tierList.tierRowList)
+                        photoBankFragment.setImageList(tierList.pendingList)
+                    }
+                }
+            }
+        }
     }
 
-    private fun onSaveButtonClick() {    //when they click SAVE
-        val tierRows = adapter.getTierRows();  //get the rows from the adapter
-        val tierList = createTierList(tierRows) //put them all in a list
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // Save tier list to database
+    private fun onSaveButtonClick() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val newTierList = TierList(
+                id = args.tierlistId,
+                title = "",
+                tierRowList = tierRowAdapter.getTierRows(),
+                pendingList = photoBankFragment.getImageList()
+            )
+            tierListViewModel.addTierList(newTierList)
+        }
         //show the keyboard to ask for a List Title
             //we could reuse some of caboosesheps code for editing row titles
 
@@ -104,23 +132,29 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
         //lastly, save it to the database
             //requires a working understanding of how databases work.
             //but at this point, tierList will contain everything it needs to be saved for later
+        //tierListViewModel.addTierList(tierList)
 
     }
-
-    private fun createTierList(tierRows: List<TierRow>): TierList {  //create instance of tierList
-        return TierList(
-            id = UUID.randomUUID(), //generate a unique ID
-            title = "", // empty at first
-            tierRowList = tierRows
-        )
-    }
-
 
     override fun onEditTitleClicked(position: Int) {
         // Implement the edit title logic here
-        val tierRow = adapter.getTierRow(position)
+        val tierRow = tierRowAdapter.getTierRow(position)
         tierRow.isEditing = true
-        adapter.notifyItemChanged(position)
+
+        // Update the tier row list in the database
+        tierListViewModel.updateTierList { oldTierList ->
+            // Update tier row with new values and put into the list
+            val updatedTierRow = tierRow.copy(
+                title = tierRow.title,
+                isEditing = true
+            )
+            val updatedTierRowList = oldTierList.tierRowList.toMutableList()
+            updatedTierRowList[position] = updatedTierRow
+
+            // Add tier row to a tier
+            oldTierList.copy(tierRowList = updatedTierRowList.toList())
+        }
+        tierRowAdapter.notifyItemChanged(position)
     }
 
     override fun onAddImageClicked(position: Int) {
@@ -143,8 +177,18 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
     }
 
     private fun handleImageSelection(position: Int, imageUrl: String) {
-        val tierRow = adapter.getTierRow(position)
-        tierRow.images.add(imageUrl)
-        adapter.notifyItemChanged(position)
+        val tierRow = tierRowAdapter.getTierRow(position)
+
+        // Update tier list in database
+        tierListViewModel.updateTierList { oldTierList ->
+            // Update tierRow with new image url
+            val updatedTierRow = tierRow.copy(images = tierRow.images + imageUrl)
+            val updatedTierRowList = oldTierList.tierRowList.toMutableList()
+            updatedTierRowList[position] = updatedTierRow
+
+            // Create a new tier list with the updated tier row list
+            oldTierList.copy(tierRowList = updatedTierRowList.toList())
+        }
+        tierRowAdapter.notifyItemChanged(position)
     }
 }
