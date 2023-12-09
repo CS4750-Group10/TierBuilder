@@ -11,6 +11,6 @@ class TierRowFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_tier_row, container, false)
+        return inflater.inflate(R.layout.item_tier_row, container, false)
     }
 }

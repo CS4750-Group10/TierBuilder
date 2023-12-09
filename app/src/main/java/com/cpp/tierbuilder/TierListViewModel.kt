@@ -1,51 +1,34 @@
 package com.cpp.tierbuilder
 
+import android.graphics.Color
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import java.util.UUID
 
-class TierListViewModel(tierListId: UUID): ViewModel() {
+class TierListViewModel : ViewModel() {
+    private val _tierList = MutableLiveData<List<TierRow>>()
+    val tierList: LiveData<List<TierRow>> get() = _tierList
 
-    private val tierListRepository = TierListRepository.get()
-
-    private val _tierList: MutableStateFlow<TierList?> = MutableStateFlow(null)
-    val tierList: StateFlow<TierList?> = _tierList.asStateFlow()
-
+    // Initialize or fetch the tier list data
     init {
-        viewModelScope.launch {
-            _tierList.value = tierListRepository.getTierList(tierListId)
+        _tierList.value = createDummyTierList()
+    }
+
+    // Function to create a dummy tier list
+    private fun createDummyTierList(): List<TierRow> {
+        val titles = listOf("S", "A", "B", "C", "D", "E", "F")
+        val colors = listOf(Color.RED, Color.parseColor("#FFA500"), Color.YELLOW, Color.GREEN, Color.BLUE, Color.parseColor("#4B0082"), Color.parseColor("#9400D3"))
+
+        return titles.mapIndexed { index, title ->
+            TierRow(title, index, colors[index], emptyList())
         }
     }
 
-    // Add tier list to database
-    suspend fun addTierList(tierList: TierList) {
-        tierListRepository.addTierList(tierList)
-    }
-
-    // Update saved private tierlist
-    fun updateTierList(onUpdate: (TierList) -> TierList) {
-        _tierList.update { oldTierList ->
-            oldTierList?.let { onUpdate(it) }
+    fun addImageToTierRow(position: Int, imageUri: String) {
+        val currentList = _tierList.value.orEmpty().toMutableList()
+        if (position >= 0 && position < currentList.size) {
+            currentList[position] = currentList[position].copy(imageUris = currentList[position].imageUris + imageUri)
+            _tierList.value = currentList
         }
-    }
-
-    // Clear public tierlist
-    override fun onCleared() {
-        super.onCleared()
-        tierList.value?.let { tierListRepository.updateTierList(it) }
-    }
-}
-
-class TierListViewModelFactory(
-    private val tierListId: UUID
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return TierListViewModel(tierListId) as T
     }
 }

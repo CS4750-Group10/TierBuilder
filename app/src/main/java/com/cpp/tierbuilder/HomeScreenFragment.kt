@@ -16,22 +16,16 @@ class HomeScreenFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home_screen, container, false)
-
         val newListButton: Button = view.findViewById(R.id.newListButton)
         val loadListButton: Button = view.findViewById(R.id.loadListButton)
 
-        // Go to Tier List Builder
+
         newListButton.setOnClickListener {
-            findNavController().navigate(
-                HomeScreenFragmentDirections.createTierList(UUID.randomUUID())
-            )
+            findNavController().navigate(R.id.tierListFragment)
         }
 
-        // Go to Saved Tier Lists
         loadListButton.setOnClickListener {
-            findNavController().navigate(
-                HomeScreenFragmentDirections.showAllLists()
-            )
+            findNavController().navigate(R.id.savedListsFragment)
         }
 
         return view

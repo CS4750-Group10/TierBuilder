@@ -1,0 +1,55 @@
+<!-- res/layout/item_tier_row.xml -->
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:rowCount="1"
+    android:columnCount="8"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <!-- Leftmost Part: Title -->
+    <LinearLayout
+        android:id="@+id/titleContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_columnWeight="1"
+        android:orientation="vertical"
+        android:background="#00FF00"
+        android:padding="8dp">
+
+        <!-- Title TextView -->
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tier Title"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <!-- Remaining Parts (7): Images -->
+    <LinearLayout
+        android:id="@+id/imagesContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="7"
+        android:orientation="horizontal">
+
+        <!-- You can use an ImageView or other views for images here -->
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher_foreground"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Add more ImageViews or views for additional images as needed -->
+
+    </LinearLayout>
+
+</GridLayout>
