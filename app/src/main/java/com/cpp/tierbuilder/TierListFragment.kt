@@ -1,9 +1,7 @@
 package com.cpp.tierbuilder
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,17 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-///
-////////////
 
-///
-//s
-//
 class TierListFragment : Fragment() {
     private lateinit var tierListViewModel: TierListViewModel
     private var selectedPosition: Int = -1  // Initialize with an invalid value
@@ -44,10 +36,13 @@ class TierListFragment : Fragment() {
         val addButton: Button = view.findViewById(R.id.addImageButton)
         addButton.setOnClickListener {
             // Show a dialog to let the user pick a row
-            showRowPickerDialog()
+            //showRowPickerDialog()
+            if (selectedPosition != -1) {
+                launchGalleryPicker(selectedPosition)
+            }
         }
 
-        showAddButton()
+        hideAddButton()
 
         // Observe changes to the tier list data and update the UI
         tierListViewModel.tierList.observe(viewLifecycleOwner) { tierList ->
@@ -55,27 +50,14 @@ class TierListFragment : Fragment() {
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
             // Create an instance of TierRowAdapter with the onRowClickListener
-            recyclerView.adapter = TierRowAdapter(tierList) {
+            recyclerView.adapter = TierRowAdapter(tierList) { clickedPosition ->
+                selectedPosition=clickedPosition
+                showAddButton()
                 // No specific actions needed when a row is clicked
             }
         }
 
 
-    }
-
-    private fun showRowPickerDialog() {
-        val rowTitles = tierListViewModel.tierList.value?.map { it.title }?.toTypedArray() ?: arrayOf()
-
-        val builder = AlertDialog.Builder(requireContext()) //try different import AlertDialog
-        builder.setTitle("Select a Row")
-        builder.setItems(rowTitles) { _, which ->
-            // 'which' is the selected index
-            val selectedPosition = which
-
-            // Now, launch the gallery picker
-            launchGalleryPicker(selectedPosition)
-        }
-        builder.show()
     }
 
     // Function to launch the gallery picker
@@ -94,17 +76,23 @@ class TierListFragment : Fragment() {
             val selectedImageUri: Uri = data.data ?: return
 
             // Use the requestCode as the selected position
-            val selectedPosition = requestCode
 
             // Assuming you have the selected image URI, add it to the current tier row
-            tierListViewModel.addImageToTierRow(selectedPosition, selectedImageUri.toString())
+            tierListViewModel.addImageToTierRow(requestCode, selectedImageUri.toString())
         }
+        hideAddButton()
     }
 
     private fun showAddButton() {
         // Show the add button
         val addButton: Button = requireView().findViewById(R.id.addImageButton)
         addButton.visibility = View.VISIBLE
+    }
+
+    private fun hideAddButton() {
+        // Hide the add button
+        val addButton: Button = requireView().findViewById(R.id.addImageButton)
+        addButton.visibility = View.INVISIBLE
     }
 
 
