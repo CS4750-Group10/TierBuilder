@@ -19,7 +19,8 @@ class TierListTypeConverters {
                 .substringBefore(")")
                 .split("; ")
 
-            rowList.add(TierRow(tierRow[0], tierRow[1].toInt(), tierRow[2], toStringList(tierRow[3]), tierRow[4].toBoolean()))
+            // Lance made change her in line with the mutable images property
+            rowList.add(TierRow(tierRow[0], tierRow[1].toInt(), tierRow[2], toStringList(tierRow[3]).toMutableList(), tierRow[4].toBoolean()))
         }
         return rowList.toList()
     }

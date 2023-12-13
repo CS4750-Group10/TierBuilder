@@ -23,6 +23,16 @@ class PhotoBankFragment : Fragment() {
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var photoAdapter: PhotoAdapter
 
+    interface PhotoSelectListener {
+        fun onPhotoSelected(imageUri: Uri)
+    }
+
+    private var photoSelectListener: PhotoSelectListener? = null
+
+    fun setPhotoSelectListener(listener: PhotoSelectListener) {
+        photoSelectListener = listener
+    }
+
     interface PhotoDragListener {
         fun onImageSelected(imageUrl: String)
     }
@@ -40,6 +50,11 @@ class PhotoBankFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        photoAdapter.onImageClick = { imageUrl ->
+            photoSelectListener?.onPhotoSelected(Uri.parse(imageUrl))
+        }
+
 
         // Initialize RecyclerView and its adapter
         photoRecyclerView = view.findViewById(R.id.photoRecyclerView)
@@ -93,23 +108,17 @@ class PhotoBankFragment : Fragment() {
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
 
-        Log.d("PhotoBankFragment", "onCreateView called")
-
         return view
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            // Get the selected image URI
             val selectedImageUri: Uri? = data?.data
-
-            // Perform your image upload logic here
             if (selectedImageUri != null) {
-                // You can use the selectedImageUri to upload the image to your server or storage
-                // For simplicity, add the selected image URL to the adapter
                 photoAdapter.addImage(selectedImageUri.toString())
+            } else {
+                Log.d("PhotoBankFragment", "the selected image URI is null")
             }
         }
     }
@@ -125,5 +134,6 @@ class PhotoBankFragment : Fragment() {
 
     companion object {
         private const val PICK_IMAGE_REQUEST = 1
+        const val TAG = "PhotoBankFragment"
     }
 }

@@ -10,11 +10,13 @@ import com.bumptech.glide.Glide
 
 class PhotoAdapter(
     private val context: Context,
-    private val onImageClick: (String) -> Unit
+    var onImageClick: ((String) -> Unit)? = null
 ) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
 
     private val imageUrls: MutableList<String> = mutableListOf()
 
+
+    // represents the view holder for each item in the RecyclerView
     inner class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageView) // Replace with your actual image view ID
     }
@@ -24,6 +26,7 @@ class PhotoAdapter(
         return PhotoViewHolder(view)
     }
 
+    // Binds the data to the views
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val imageUrl = imageUrls[position]
 
@@ -31,7 +34,7 @@ class PhotoAdapter(
             .load(imageUrl)
             .into(holder.imageView)
 
-        holder.itemView.setOnClickListener { onImageClick(imageUrl) }
+        holder.itemView.setOnClickListener { onImageClick?.let { it1 -> it1(imageUrl) } }
     }
 
     override fun getItemCount(): Int {

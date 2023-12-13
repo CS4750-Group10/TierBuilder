@@ -1,6 +1,7 @@
 package com.cpp.tierbuilder
 
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
+import android.content.Context;
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.util.Log
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import java.io.BufferedInputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 // Add a callback interface
 interface TierRowEditListener {
@@ -28,20 +42,25 @@ class TierRowAdapter(
         fun onAddImageClicked(position: Int)
     }
 
-
     init {
+//        val defaultLabels = listOf("S", "A", "B", "C", "D", "E", "F")
+//        for ((index, label) in defaultLabels.withIndex()) {
+//            val sampleImages = mutableListOf(
+//                "https://kitchenatics.com/wp-content/uploads/2020/09/Cheese-pizza-1.jpg", // Replace with actual image URLs
+//                "https://www.iheartnaptime.net/wp-content/uploads/2023/04/Pepperoni-Pizza-Recipe-I-Heart-Naptime.jpg"
+//            )
+//            val tierRow = TierRow(label, index + 1, "Color", sampleImages)
+//
+//            tierRows.add(tierRow)
+//        }
         generateDefaultRows()
     }
+
     private fun generateDefaultRows() {
         val defaultLabels = listOf("S", "A", "B", "C", "D", "E", "F")
         for ((index, label) in defaultLabels.withIndex()) {
-            val tierRow = if (index == 0) {
-                // Add a sample image to the first tier row
-                val sampleImageUrl = "https://example.com/sample-image.jpg"
-                TierRow(label, index + 1, "Color", mutableListOf(sampleImageUrl))
-            } else {
-                TierRow(label, index + 1, "Color", mutableListOf())
-            }
+            val tierRow = TierRow(label, index + 1, "Color", mutableListOf())
+
             tierRows.add(tierRow)
         }
     }
@@ -54,6 +73,29 @@ class TierRowAdapter(
         val btnAddImage: ImageView = itemView.findViewById(R.id.btnAddImage)
 
         val imageContainer: FlexboxLayout = itemView.findViewById(R.id.imageContainer)
+
+        fun addImageToFlexbox(imageUrl: String) {
+            val imageView = ImageView(itemView.context).apply {
+                layoutParams = FlexboxLayout.LayoutParams(
+                    200,
+                    200
+                ).also {
+                    // Set a margin if necessary
+                    val margin = itemView.resources.getDimensionPixelSize(R.dimen.image_margin)
+                    it.setMargins(margin, margin, margin, margin)
+                }
+                // You may want to adjust the image size here if necessary
+            }
+
+            // Load the image using Glide with error handling and logging
+            Glide.with(itemView.context)
+                .load(imageUrl)
+                .error(R.drawable.error_placeholder)  // Use your error placeholder
+                .into(imageView)
+
+            // Add the ImageView to the FlexboxLayout
+            imageContainer.addView(imageView)
+        }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TierRowViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -63,6 +105,12 @@ class TierRowAdapter(
 
     override fun onBindViewHolder(holder: TierRowViewHolder, position: Int) {
         val tierRow = tierRows[position]
+        holder.imageContainer.removeAllViews() // Clear existing images
+
+        tierRow.images.forEach { imageUrl ->
+            holder.addImageToFlexbox(imageUrl)
+        }
+
         holder.labelTextView.text = tierRow.title
         holder.labelTextView.setOnClickListener {
             editListener.onEditTitleClicked(position)
@@ -71,28 +119,14 @@ class TierRowAdapter(
         holder.editTitleEditText.inputType =
             android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
 
-        // Clear existing views in the FlexboxLayout
-        holder.imageContainer.removeAllViews()
+//        for (imageUrl in tierRow.images) {
+//            holder.addImageToFlexbox(imageUrl)
+//        }
 
-        // Add ImageViews dynamically to the FlexboxLayout based on the images associated with the tier row
-        for (imageUrl in tierRow.images) {
-            val imageView = ImageView(holder.itemView.context)
-
-            // Set layout parameters for the ImageView
-            val layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            imageView.layoutParams = layoutParams
-
-            // Load the image using your preferred image loading library (e.g., Glide)
-            Glide.with(holder.itemView.context)
-                .load(imageUrl)
-                .into(imageView)
-
-            // Add the ImageView to the FlexboxLayout
-            holder.imageContainer.addView(imageView)
-        }
+//        // Add ImageViews dynamically to the FlexboxLayout based on the images associated with the tier row
+//        tierRow.images.forEach { imageUrl ->
+//            holder.addImageToFlexbox(imageUrl)
+//        }
 
         // Update the visibility of views based on the edit mode
         if (tierRow.isEditing) {
@@ -133,7 +167,7 @@ class TierRowAdapter(
 
         holder.btnAddImage.setOnClickListener {
             // Notify the listener that the add image icon is clicked
-            imageAdditionListener?.onAddImageClicked(position)
+            imageAdditionListener?.onAddImageClicked(holder.adapterPosition)
         }
 
     }

@@ -1,5 +1,6 @@
 package com.cpp.tierbuilder
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,7 +38,15 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
 
     private lateinit var tierRowAdapter: TierRowAdapter
     private val photoBankFragment = PhotoBankFragment()
+    private var selectedTierRowPosition: Int? = null
 
+    fun onPhotoSelected(imageUri: Uri) {
+        selectedTierRowPosition?.let { position ->
+            val tierRow = tierRowAdapter.getTierRow(position)
+            tierRow.images.toMutableList().add(imageUri.toString())
+            tierRowAdapter.notifyItemChanged(position)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,6 +68,12 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        photoBankFragment.setPhotoSelectListener(object : PhotoBankFragment.PhotoSelectListener {
+            override fun onPhotoSelected(imageUri: Uri) {
+                onImageSelected(imageUri, selectedTierRowPosition ?: return)
+            }
+        })
 
         //Initialize Options Menu functionality
         val menuHost: MenuHost = requireActivity()
@@ -99,6 +114,8 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 tierListViewModel.tierList.collect { tierList ->
+                    Log.d("TierListFragment", "Received tier list update: $tierList")
+
                     tierList?.let {
                         tierRowAdapter.setTierRows(tierList.tierRowList)
                         photoBankFragment.setImageList(tierList.pendingList)
@@ -159,21 +176,41 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
 
     override fun onAddImageClicked(position: Int) {
         Log.d("TierListFragment", "onAddImageClicked called for position $position")
+        selectedTierRowPosition = position
         // Open PhotoBankFragment to allow image selection for the specific tier row
         openPhotoBankFragment(position)
     }
 
+    fun onImageSelected(imageUri: Uri, position: Int) {
+        val tierRow = tierRowAdapter.getTierRow(position)
+        tierRow.images.add(imageUri.toString()) // Directly add to the mutable list
+        tierRowAdapter.notifyItemChanged(position)
+    }
+
     private fun openPhotoBankFragment(position: Int) {
-        // Assuming you have a reference to the existing PhotoBankFragment
-        val photoBankFragment = childFragmentManager.findFragmentById(R.id.fragmentContainer) as? PhotoBankFragment
+
+//        val fragmentTransaction = childFragmentManager.beginTransaction()
+//
+//        // Check if the PhotoBankFragment is already added to the fragment manager
+//        var photoBankFragment = childFragmentManager.findFragmentByTag(PhotoBankFragment.TAG) as? PhotoBankFragment
+//
+//        if (photoBankFragment == null) {
+//            // If not, create a new instance and add it to the fragment manager
+//            photoBankFragment = PhotoBankFragment()
+//            fragmentTransaction.replace(R.id.fragmentContainer, photoBankFragment, PhotoBankFragment.TAG)
+//        }
 
         // Set a callback listener for image selection
         photoBankFragment?.setPhotoDragListener(object : PhotoBankFragment.PhotoDragListener {
             override fun onImageSelected(imageUrl: String) {
-                // Handle the selected image URL and add it to the tier row
-                handleImageSelection(position, imageUrl)
+                // Convert String URL to Uri
+                val imageUri = Uri.parse(imageUrl)
+                onImageSelected(imageUri, position)
             }
         })
+
+        // Commit the fragment transaction
+        //fragmentTransaction.commit()
     }
 
     private fun handleImageSelection(position: Int, imageUrl: String) {
@@ -181,14 +218,19 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
 
         // Update tier list in database
         tierListViewModel.updateTierList { oldTierList ->
+            Log.d("TierListFragment", "Updating tier list...")
             // Update tierRow with new image url
-            val updatedTierRow = tierRow.copy(images = tierRow.images + imageUrl)
+            val updatedTierRow = tierRow.copy(images = (tierRow.images.toMutableList() + imageUrl).toMutableList())
             val updatedTierRowList = oldTierList.tierRowList.toMutableList()
             updatedTierRowList[position] = updatedTierRow
+
+            Log.d("TierListFragment", "Updated TierRow images:")
+            updatedTierRow.images.forEach { Log.d("TierListFragment", it) }
 
             // Create a new tier list with the updated tier row list
             oldTierList.copy(tierRowList = updatedTierRowList.toList())
         }
         tierRowAdapter.notifyItemChanged(position)
     }
+
 }

@@ -1,58 +1,63 @@
 <!-- fragment_tier_list.xml -->
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#000000">
+    android:background="#040404">
 
-    <!-- Toolbar for the menu bar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tierlist_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
-
-    <LinearLayout
-        android:id="@+id/topLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tierlist_toolbar"
-        android:orientation="vertical">
-
-        <!-- RecyclerView with ID recyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tier_row_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/bottomLayout"
-            android:layout_weight="1"
-            android:background="#FFFFFF"></androidx.recyclerview.widget.RecyclerView>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
-    </LinearLayout>
-
-    <!-- FrameLayout with ID fragmentContainer -->
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topLayout"
-        android:background="#000000"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <LinearLayout
-        android:id="@+id/bottomLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
         android:background="#000000">
-        <!-- Remove the buttons from here -->
-    </LinearLayout>
-</RelativeLayout>
+
+        <!-- Toolbar for the menu bar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tierlist_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+
+        <LinearLayout
+            android:id="@+id/topLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tierlist_toolbar"
+            android:orientation="vertical">
+
+            <!-- RecyclerView with ID recyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tier_row_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/bottomLayout"
+                android:layout_weight="1"
+                android:background="#232121"></androidx.recyclerview.widget.RecyclerView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#000000" />
+        </LinearLayout>
+
+        <!-- FrameLayout with ID fragmentContainer -->
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/topLayout"
+            android:background="#000000"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <LinearLayout
+            android:id="@+id/bottomLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#000000"
+            android:orientation="horizontal">
+            <!-- Remove the buttons from here -->
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>

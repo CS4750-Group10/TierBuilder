@@ -1,12 +1,12 @@
 package com.cpp.tierbuilder
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -30,9 +30,9 @@ class TierListViewModel(tierListId: UUID): ViewModel() {
 
     // Update saved private tierlist
     fun updateTierList(onUpdate: (TierList) -> TierList) {
-        _tierList.update { oldTierList ->
-            oldTierList?.let { onUpdate(it) }
-        }
+        Log.d("TierListViewModel", "updateTierList called")
+
+        _tierList.value = _tierList.value?.let { onUpdate(it) }
     }
 
     // Clear public tierlist
