@@ -13,9 +13,11 @@ import android.widget.Button
 import android.widget.GridView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.cpp.tierbuilder.database.SharedViewModel
 
 // PhotoBankFragment.kt
 class PhotoBankFragment : Fragment() {
@@ -28,6 +30,8 @@ class PhotoBankFragment : Fragment() {
     }
 
     private var photoSelectListener: PhotoSelectListener? = null
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+
 
     fun setPhotoSelectListener(listener: PhotoSelectListener) {
         photoSelectListener = listener
@@ -76,7 +80,11 @@ class PhotoBankFragment : Fragment() {
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
 
-        Log.d("PhotoBankFragment", "onViewCreated called")
+        // Observe changes in photo bank images
+        sharedViewModel.getPhotoBankImages().observe(viewLifecycleOwner) { images ->
+            // Update photo bank with new data
+            photoAdapter.setImages(images)
+        }
 
     }
 
@@ -117,6 +125,8 @@ class PhotoBankFragment : Fragment() {
             val selectedImageUri: Uri? = data?.data
             if (selectedImageUri != null) {
                 photoAdapter.addImage(selectedImageUri.toString())
+                val updatedImages = photoAdapter.getImageList()
+                sharedViewModel.updatePhotoBankImages(updatedImages) // Update the ViewModel with the new images
             } else {
                 Log.d("PhotoBankFragment", "the selected image URI is null")
             }

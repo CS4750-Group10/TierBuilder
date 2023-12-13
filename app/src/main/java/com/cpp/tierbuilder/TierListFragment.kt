@@ -19,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
+import com.cpp.tierbuilder.database.SharedViewModel
 import com.cpp.tierbuilder.databinding.FragmentTierListBinding
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,7 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
     private lateinit var tierRowAdapter: TierRowAdapter
     private val photoBankFragment = PhotoBankFragment()
     private var selectedTierRowPosition: Int? = null
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     fun onPhotoSelected(imageUri: Uri) {
         selectedTierRowPosition?.let { position ->
@@ -123,6 +125,11 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
                 }
             }
         }
+
+        sharedViewModel.getTierRowsImages().observe(viewLifecycleOwner) { rows ->
+            // Update tier rows with new data
+            tierRowAdapter.setTierRows(rows)
+        }
     }
 
     override fun onDestroyView() {
@@ -185,6 +192,14 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
         val tierRow = tierRowAdapter.getTierRow(position)
         tierRow.images.add(imageUri.toString()) // Directly add to the mutable list
         tierRowAdapter.notifyItemChanged(position)
+
+        // Update the tierRows list with the modified tierRow
+        val updatedRows = tierRowAdapter.getTierRows().toMutableList().apply {
+            this[position] = tierRow
+        }
+
+        // Update the ViewModel with the new rows
+        sharedViewModel.updateTierRowsImages(updatedRows)
     }
 
     private fun openPhotoBankFragment(position: Int) {
@@ -232,5 +247,4 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
         }
         tierRowAdapter.notifyItemChanged(position)
     }
-
 }
