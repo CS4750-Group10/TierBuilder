@@ -9,6 +9,6 @@ data class TierRow(
 )
  {
     override fun toString(): String {
-        return "TierRow($title, $row, $color, $images, $isEditing)"
+        return "TierRow($title; $row; $color; $images; $isEditing)"
     }
 }

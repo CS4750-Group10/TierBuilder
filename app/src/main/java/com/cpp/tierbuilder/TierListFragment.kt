@@ -2,6 +2,9 @@ package com.cpp.tierbuilder
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -9,6 +12,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +26,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.cpp.tierbuilder.database.SharedViewModel
 import com.cpp.tierbuilder.databinding.FragmentTierListBinding
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAdditionListener {
@@ -99,10 +105,6 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
                         }
                         true
                     }
-                    R.id.menu_save ->{
-                        onSaveButtonClick()
-                        true
-                    }
                     else -> false
                 }
             }
@@ -118,10 +120,7 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
                 tierListViewModel.tierList.collect { tierList ->
                     Log.d("TierListFragment", "Received tier list update: $tierList")
 
-                    tierList?.let {
-                        tierRowAdapter.setTierRows(tierList.tierRowList)
-                        photoBankFragment.setImageList(tierList.pendingList)
-                    }
+                    tierList?.let { updateUi(it) }
                 }
             }
         }
@@ -130,6 +129,19 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
             // Update tier rows with new data
             tierRowAdapter.setTierRows(rows)
         }
+
+        binding.tierListTitle.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val newTitle = s?.toString() ?: ""
+                tierListViewModel.updateTierList { oldTierList ->
+                    oldTierList.copy(title = newTitle)
+                }
+            }
+        })
     }
 
     override fun onDestroyView() {
@@ -137,27 +149,15 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
         _binding = null
     }
 
-    // Save tier list to database
-    private fun onSaveButtonClick() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val newTierList = TierList(
-                id = args.tierlistId,
-                title = "",
-                tierRowList = tierRowAdapter.getTierRows(),
-                pendingList = photoBankFragment.getImageList()
-            )
-            tierListViewModel.addTierList(newTierList)
+    // Update UI
+    private fun updateUi(tierList: TierList) {
+        binding.apply {
+            if (tierListTitle.text.toString() != tierList.title) {
+                tierListTitle.setText(tierList.title)
+            }
+
+            tierRowAdapter.setTierRows(tierList.tierRowList)
         }
-        //show the keyboard to ask for a List Title
-            //we could reuse some of caboosesheps code for editing row titles
-
-        //tierList.title = whateverTheUserTyped
-
-        //lastly, save it to the database
-            //requires a working understanding of how databases work.
-            //but at this point, tierList will contain everything it needs to be saved for later
-        //tierListViewModel.addTierList(tierList)
-
     }
 
     override fun onEditTitleClicked(position: Int) {
@@ -200,6 +200,10 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
 
         // Update the ViewModel with the new rows
         sharedViewModel.updateTierRowsImages(updatedRows)
+        tierListViewModel.updateTierList { oldTierList ->
+            val newTierRows = sharedViewModel.getTierRowsImages().value!!
+            oldTierList.copy(tierRowList = newTierRows)
+        }
     }
 
     private fun openPhotoBankFragment(position: Int) {
@@ -228,7 +232,7 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
         //fragmentTransaction.commit()
     }
 
-    private fun handleImageSelection(position: Int, imageUrl: String) {
+    /*private fun handleImageSelection(position: Int, imageUrl: String) {
         val tierRow = tierRowAdapter.getTierRow(position)
 
         // Update tier list in database
@@ -246,5 +250,5 @@ class TierListFragment : Fragment(), TierRowEditListener, TierRowAdapter.ImageAd
             oldTierList.copy(tierRowList = updatedTierRowList.toList())
         }
         tierRowAdapter.notifyItemChanged(position)
-    }
+    } */
 }

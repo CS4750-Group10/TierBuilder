@@ -87,10 +87,9 @@ class TierRowAdapter(
                 // You may want to adjust the image size here if necessary
             }
 
-            // Load the image using Glide with error handling and logging
+            // Load the image using Glide
             Glide.with(itemView.context)
                 .load(imageUrl)
-                .error(R.drawable.error_placeholder)  // Use your error placeholder
                 .into(imageView)
 
             // Add the ImageView to the FlexboxLayout

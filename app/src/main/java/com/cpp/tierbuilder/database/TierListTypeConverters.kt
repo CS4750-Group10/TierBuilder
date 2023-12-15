@@ -1,16 +1,18 @@
 package com.cpp.tierbuilder.database
 
+import android.util.Log
 import androidx.room.TypeConverter
 import com.cpp.tierbuilder.TierRow
 
 class TierListTypeConverters {
     @TypeConverter
-    fun fromRowList(rowList: List<TierRow>): String {
+    fun fromTierRowList(rowList: List<TierRow>): String {
         return rowList.joinToString(separator = " | ")
     }
 
     @TypeConverter
-    fun toRowList(rowListString: String): List<TierRow> {
+    fun toTierRowList(rowListString: String): List<TierRow> {
+        Log.d("TierTypeConverters", rowListString)
         val rowList = mutableListOf<TierRow>()
 
         for (rowString in rowListString.split(" | ")) {
@@ -19,23 +21,15 @@ class TierListTypeConverters {
                 .substringBefore(")")
                 .split("; ")
 
+            val stringList = tierRow[3]
+                .substringAfter("[")
+                .substringBefore("]")
+                .split(", ")
+
             // Lance made change her in line with the mutable images property
-            rowList.add(TierRow(tierRow[0], tierRow[1].toInt(), tierRow[2], toStringList(tierRow[3]).toMutableList(), tierRow[4].toBoolean()))
+            rowList.add(TierRow(tierRow[0], tierRow[1].toInt(), tierRow[2], stringList.toMutableList(), tierRow[4].toBoolean()))
         }
         return rowList.toList()
-    }
-
-    @TypeConverter
-    fun fromStringList(stringList: List<String>): String {
-        return stringList.toString()
-    }
-    @TypeConverter
-    fun toStringList(listString: String): List<String> {
-        val stringList = listString
-            .substringAfter("[")
-            .substringBefore("]")
-            .split(", ")
-        return stringList
     }
 }
 

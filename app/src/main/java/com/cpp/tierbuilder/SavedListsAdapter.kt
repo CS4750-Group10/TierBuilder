@@ -26,12 +26,19 @@ class ListHolder(
         binding.root.setOnLongClickListener {
             onListLongClicked(tierList.id)
         }
+
+        if (tierList.isSelected) {
+            binding.root.setBackgroundColor(Color.LTGRAY)
+            binding.tierlistSelected.visibility = View.VISIBLE
+        } else {
+            binding.root.setBackgroundColor(Color.TRANSPARENT)
+            binding.tierlistSelected.visibility = View.GONE
+        }
     }
 }
 
 class SavedListsAdapter(
     private val tierLists: List<TierList>,
-    private val savedListsViewModel: SavedListsViewModel,
     private val onListClicked: (listId: UUID) -> Unit,
     private val onListLongClicked: (listId: UUID) -> Boolean
 ) : RecyclerView.Adapter<ListHolder>() {
@@ -48,15 +55,6 @@ class SavedListsAdapter(
     override fun onBindViewHolder(holder: ListHolder, position: Int) {
         val tierlist = tierLists[position]
         holder.bind(tierlist, onListClicked, onListLongClicked)
-
-        // change UI for selected items
-        if (savedListsViewModel.selectedLists.contains(tierlist.id)) {
-            holder.binding.tierlistSelected.visibility = View.VISIBLE
-            holder.itemView.setBackgroundColor(Color.LTGRAY)
-        } else {
-            holder.binding.tierlistSelected.visibility = View.GONE
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
-        }
     }
 
     override fun getItemCount(): Int = tierLists.size

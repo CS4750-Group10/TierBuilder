@@ -11,18 +11,14 @@ import java.util.UUID
 class SavedListsViewModel : ViewModel() {
     private val tierListRepository = TierListRepository.get()
 
-    private val _tierlists: MutableStateFlow<List<TierList>> = MutableStateFlow(emptyList())
-    val tierlists: StateFlow<List<TierList>>
-        get() = _tierlists.asStateFlow()
-
-    private var _selectedLists = mutableListOf<UUID>()
-    val selectedLists: List<UUID>
-        get() = _selectedLists.toList()
+    private val _tierLists: MutableStateFlow<List<TierList>> = MutableStateFlow(emptyList())
+    val tierLists: StateFlow<List<TierList>>
+    get() = _tierLists.asStateFlow()
 
     init {
         viewModelScope.launch {
             tierListRepository.getTierLists().collect() {
-                _tierlists.value = it
+                _tierLists.value = it
             }
         }
     }
@@ -31,7 +27,8 @@ class SavedListsViewModel : ViewModel() {
         val oldTierList = tierListRepository.getTierList(tierListId)
         val copy = oldTierList.copy(
             id = UUID.randomUUID(),
-            title = "Copy of ${oldTierList.title}"
+            title = "Copy of ${oldTierList.title}",
+            isSelected = false
         )
         tierListRepository.addTierList(copy)
     }
@@ -42,15 +39,31 @@ class SavedListsViewModel : ViewModel() {
     }
 
     // Functions for selected items in RecyclerView
-    fun toggleSelection(tierListId: UUID) {
-        if (_selectedLists.contains(tierListId)) {
-            _selectedLists.remove(tierListId)
-        } else {
-            _selectedLists.add(tierListId)
+    suspend fun toggleSelection(tierListId: UUID) {
+        val tierList = tierListRepository.getTierList(tierListId)
+        tierList.isSelected = !tierList.isSelected
+        tierListRepository.updateTierList(tierList)
+    }
+
+    fun clearSelection() {
+        val mutableTierLists = _tierLists.value.toMutableList()
+        for (tierList in mutableTierLists) {
+            if (tierList.isSelected) {
+                tierList.isSelected = false
+                tierListRepository.updateTierList(tierList)
+            }
         }
     }
 
-    fun clearSelections() {
-        _selectedLists.clear()
+    // Iterate through all selected items
+    fun iterateSelectedItems(action: (TierList) -> Unit) {
+        viewModelScope.launch {
+            val tierLists = _tierLists.value
+            for (tierList in tierLists) {
+                if (tierList.isSelected) {
+                    action.invoke(tierList)
+                }
+            }
+        }
     }
 }

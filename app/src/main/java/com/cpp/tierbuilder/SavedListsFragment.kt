@@ -47,9 +47,9 @@ class SavedListsFragment : Fragment() {
         override fun onActionItemClicked(mode: ActionMode, menuItem: MenuItem): Boolean {
             when (menuItem.itemId) {
                 R.id.copy_tierlist -> {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        for (listId in savedListsViewModel.selectedLists) {
-                            savedListsViewModel.copyTierList(listId)
+                    savedListsViewModel.iterateSelectedItems { tierList ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            savedListsViewModel.copyTierList(tierList.id)
                         }
                     }
                     mode.finish()
@@ -57,9 +57,9 @@ class SavedListsFragment : Fragment() {
                     return true
                 }
                 R.id.delete_tierlist -> {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        for (listId in savedListsViewModel.selectedLists) {
-                            savedListsViewModel.deleteTierList(listId)
+                    savedListsViewModel.iterateSelectedItems { tierList ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            savedListsViewModel.deleteTierList(tierList.id)
                         }
                     }
                     mode.finish()
@@ -73,7 +73,7 @@ class SavedListsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             mode.finish()
             actionMode = null
-            savedListsViewModel.clearSelections()
+            savedListsViewModel.clearSelection()
         }
     }
 
@@ -93,10 +93,10 @@ class SavedListsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                savedListsViewModel.tierlists.collect { tierlists ->
+                savedListsViewModel.tierLists.collect { tierLists ->
                     // Initalize RecyclerView's adapter with short and long click functions
                     binding.savedTierlistRecyclerView.adapter =
-                        SavedListsAdapter(tierlists, savedListsViewModel,
+                        SavedListsAdapter(tierLists,
                             onListClicked = { tierListId ->
                             findNavController().navigate(
                                 SavedListsFragmentDirections.loadTierList(tierListId)
@@ -105,7 +105,9 @@ class SavedListsFragment : Fragment() {
                             if (actionMode == null) {
                                 actionMode = requireActivity().startActionMode(actionModeCallback)
                             }
-                            savedListsViewModel.toggleSelection(tierlistId)
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                savedListsViewModel.toggleSelection(tierlistId)
+                            }
                             true
                         })
                 }

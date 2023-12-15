@@ -23,11 +23,6 @@ class TierListViewModel(tierListId: UUID): ViewModel() {
         }
     }
 
-    // Add tier list to database
-    suspend fun addTierList(tierList: TierList) {
-        tierListRepository.addTierList(tierList)
-    }
-
     // Update saved private tierlist
     fun updateTierList(onUpdate: (TierList) -> TierList) {
         Log.d("TierListViewModel", "updateTierList called")

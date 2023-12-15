@@ -41,7 +41,7 @@
             app:justifyContent="flex_start"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tierTextView"
-            app:layout_constraintTop_toTopOf="parent"  />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/btnAddImage"

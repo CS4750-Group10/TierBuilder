@@ -13,10 +13,4 @@
         android:icon="@drawable/delete_row"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/menu_save"
-        android:title="Save"
-        android:icon="@drawable/save_list"
-        app:showAsAction="ifRoom" />
-
 </menu>
